@@ -1,8 +1,15 @@
 import { observe } from './index'
+import { arrayMethods, observerArray } from './array'
 
 class Observer {
   constructor (data) {
-    this.walk(data)
+    if (Array.isArray(data)) {
+      Object.setPrototypeOf(data, arrayMethods)
+      // 监听数组里的每一项
+      observerArray(data)
+    } else {
+      this.walk(data)
+    }
   }
 
   walk (data) {
@@ -19,6 +26,7 @@ export function definReactive (data, key, value) {
     },
     set (newValue) {
       if (value === newValue) return
+      observe(newValue)
       value = newValue
     }
   })
