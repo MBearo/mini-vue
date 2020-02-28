@@ -14,4 +14,3 @@ const vm = new Vue({
   }
 })
 console.log(vm)
-vm.arr.push(4)
