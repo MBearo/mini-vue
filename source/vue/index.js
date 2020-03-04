@@ -1,8 +1,21 @@
 import { initState } from './observe'
 import Watcher from './observe/watcher'
 
-function Vue (options) {
-  this._init(options)
+const defaultRE = /\{\{((?:.|\r?\n)+?)\}\}/g
+
+const util = {
+  getValue (vm, expr) {
+    const keys = expr.split('.')
+    return keys.reduce((memo, current) => {
+      memo = memo[current]
+      return memo
+    }, vm)
+  },
+  compilerText (node, vm) {
+    node.textContent = node.textContent.replace(defaultRE, (...args) => {
+      return util.getValue(vm, args[1])
+    })
+  }
 }
 Vue.prototype._init = function (options) {
   const vm = this
@@ -21,7 +34,8 @@ Vue.prototype._update = function () {
 
   const node = document.createDocumentFragment()
   let firstChild
-  while (firstChild = el.firstChild) {
+  while (el.firstChild) {
+    firstChild = el.firstChild
     node.appendChild(firstChild)
   }
   compiler(node, vm)
@@ -45,26 +59,8 @@ function query (el) {
   return el
 }
 
-const defaultRE = /\{\{((?:.|\r?\n)+?)\}\}/g
-
-const util = {
-  getValue (vm, expr) {
-    const keys = expr.split('.')
-    return keys.reduce((memo, current) => {
-      memo = memo[current]
-      return memo
-    }, vm)
-  },
-  compilerText (node, vm) {
-    node.textContent = node.textContent.replace(defaultRE, (...args) => {
-      return util.getValue(vm, args[1])
-    })
-  }
-}
-
 function compiler (node, vm) {
-  const childNodes = node.childNodes
-  console.log(childNodes);
+  const childNodes = node.childNodes;
   [...childNodes].forEach(child => {
     if (child.nodeType === 1) {
       compiler(child, vm)
@@ -72,5 +68,9 @@ function compiler (node, vm) {
       util.compilerText(child, vm)
     }
   })
+}
+
+function Vue (options) {
+  this._init(options)
 }
 export default Vue

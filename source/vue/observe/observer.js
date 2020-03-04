@@ -1,5 +1,6 @@
 import { observe } from './index'
 import { arrayMethods, observerArray } from './array'
+import Dep from './dep'
 
 class Observer {
   constructor (data) {
@@ -18,16 +19,24 @@ class Observer {
     })
   }
 }
+
 export function definReactive (data, key, value) {
   observe(value)
+  // 这里相当于每个属性都添加一个 Dep 实例
+  const dep = new Dep()
   Object.defineProperty(data, key, {
     get () {
+      if (Dep.target) {
+        // dep.addSub(Dep.target)
+        dep.depend()
+      }
       return value
     },
     set (newValue) {
       if (value === newValue) return
       observe(newValue)
       value = newValue
+      dep.notify()
     }
   })
 }

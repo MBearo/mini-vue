@@ -1,21 +1,5 @@
 import Observer from './observer'
 
-export function initState (vm) {
-  const opts = vm.$options
-  if (opts.data) {
-    initData(vm)
-  }
-  if (opts.computed) {
-    initComputed(vm)
-  }
-  if (opts.watch) {
-    initWatch(vm)
-  }
-}
-export function observe (data) {
-  if (typeof data !== 'object' || data === null) return
-  return new Observer(data)
-}
 function proxy (vm, source, key) {
   Object.defineProperty(vm, key, {
     get () {
@@ -39,4 +23,22 @@ function initComputed () {
 }
 function initWatch () {
 
+}
+
+export function initState (vm) {
+  const opts = vm.$options
+  if (opts.data) {
+    initData(vm)
+  }
+  if (opts.computed) {
+    initComputed(vm)
+  }
+  if (opts.watch) {
+    initWatch(vm)
+  }
+}
+
+export function observe (data) {
+  if (typeof data !== 'object' || data === null) return
+  return new Observer(data)
 }
