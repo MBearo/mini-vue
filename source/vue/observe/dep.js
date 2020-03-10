@@ -16,6 +16,9 @@ class Dep {
   depend () {
     if (Dep.target) {
       // 使 dep 和 watcher 互相关联
+      // this 指的 dep
+      // target 是 watcher
+      // addDep 是 watcher 上的方法
       Dep.target.addDep(this)
     }
   }

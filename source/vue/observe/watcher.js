@@ -39,6 +39,7 @@ class Watcher {
     if (!this.depsId.has(id)) {
       this.depsId.add(id)
       this.deps.push(dep)
+      // this 指 watcher
       dep.addSub(this)
     }
   }

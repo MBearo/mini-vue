@@ -14,3 +14,9 @@ const vm = new Vue({
   }
 })
 console.log(vm)
+setTimeout(_ => {
+  vm.msg = 'world'
+}, 1000)
+setTimeout(_ => {
+  vm.msg = 'world2'
+}, 2000)
