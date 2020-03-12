@@ -1,9 +1,13 @@
 import { observe } from './index'
-import { arrayMethods, observerArray } from './array'
+import { arrayMethods, observerArray, dependArray } from './array'
 import Dep from './dep'
 
 class Observer {
   constructor (data) {
+    this.dep = new Dep()
+    Object.defineProperty(data, '__ob__', {
+      get: _ => this
+    })
     if (Array.isArray(data)) {
       Object.setPrototypeOf(data, arrayMethods)
       // 监听数组里的每一项
@@ -21,14 +25,17 @@ class Observer {
 }
 
 export function definReactive (data, key, value) {
-  observe(value)
+  const childOb = observe(value)
   // 这里相当于每个属性都添加一个 Dep 实例
   const dep = new Dep()
   Object.defineProperty(data, key, {
     get () {
       if (Dep.target) {
-        // dep.addSub(Dep.target)
         dep.depend()
+        if (childOb) {
+          childOb.dep.depend()
+          dependArray(value)
+        }
       }
       return value
     },
