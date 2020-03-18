@@ -1,26 +1,6 @@
 import { initState } from './observe'
 import Watcher from './observe/watcher'
 
-const defaultRE = /\{\{((?:.|\r?\n)+?)\}\}/g
-
-const util = {
-  getValue (vm, expr) {
-    const keys = expr.split('.')
-    return keys.reduce((memo, current) => {
-      memo = memo[current]
-      return memo
-    }, vm)
-  },
-  compilerText (node, vm) {
-    // node.expr 没有的话获取 node.textContent,即为第一次的表达式
-    if (!node.expr) {
-      node.expr = node.textContent
-    }
-    node.textContent = node.expr.replace(defaultRE, (...args) => {
-      return util.getValue(vm, args[1])
-    })
-  }
-}
 Vue.prototype._init = function (options) {
   const vm = this
   vm.$options = options
@@ -56,6 +36,10 @@ Vue.prototype.$mount = function () {
   const watcher = new Watcher(vm, updateComponent)
 }
 
+function Vue (options) {
+  this._init(options)
+}
+
 function query (el) {
   if (typeof el === 'string') {
     return document.querySelector(el)
@@ -73,8 +57,24 @@ function compiler (node, vm) {
     }
   })
 }
+const defaultRE = /\{\{((?:.|\r?\n)+?)\}\}/g
 
-function Vue (options) {
-  this._init(options)
+const util = {
+  getValue (vm, expr) {
+    const keys = expr.split('.')
+    return keys.reduce((memo, current) => {
+      memo = memo[current]
+      return memo
+    }, vm)
+  },
+  compilerText (node, vm) {
+    // node.expr 没有的话获取 node.textContent,即为第一次的表达式
+    if (!node.expr) {
+      node.expr = node.textContent
+    }
+    node.textContent = node.expr.replace(defaultRE, (...args) => {
+      return util.getValue(vm, args[1])
+    })
+  }
 }
 export default Vue
