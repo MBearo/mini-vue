@@ -21,8 +21,22 @@ function initData (vm) {
 function initComputed () {
 
 }
-function initWatch () {
+function initWatch (vm) {
+  const watch = vm.$options.watch
+  for (const key in watch) {
+    const userDef = watch[key]
+    let handler
+    if (userDef.handler) {
+      handler = userDef.handler
+    } else {
+      handler = userDef
+    }
+    createWatcher(vm, key, handler, { immediate: userDef.immediate })
+  }
+}
 
+function createWatcher (vm, key, handler, opts) {
+  return vm.$watch(key, handler, opts)
 }
 
 export function initState (vm) {

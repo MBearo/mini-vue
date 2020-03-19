@@ -1,4 +1,7 @@
 import { pushTarget, popTarget } from './dep'
+import { queueWatcher } from './nextTick'
+import { util } from '../util'
+
 let id = 0
 class Watcher {
   /**
@@ -13,6 +16,13 @@ class Watcher {
     this.exprOrFn = exprOrFn
     if (typeof exprOrFn === 'function') {
       this.getter = exprOrFn
+    } else {
+      this.getter = function () {
+        return util.getValue(vm, exprOrFn)
+      }
+    }
+    if (opts.user) {
+      this.user = true
     }
     this.cb = cb
     this.opts = opts
@@ -20,13 +30,19 @@ class Watcher {
 
     this.depsId = new Set()
     this.deps = []
-    this.get()
+    // 创建 watcher 先将表达式对应的值取出来，也就是 old value
+    this.value = this.get()
+    this.immediate = opts.immediate
+    if (this.immediate) {
+      this.cb(this.value)
+    }
   }
 
   get () {
     pushTarget(this)
-    this.getter()
+    const value = this.getter()
     popTarget()
+    return value
   }
 
   update () {
@@ -34,7 +50,11 @@ class Watcher {
   }
 
   run () {
-    this.get()
+    // 新值
+    const value = this.get()
+    if (value !== this.value) {
+      this.cb(value, this.value)
+    }
   }
 
   // 使 watcher 和 dep 互相关联
@@ -49,42 +69,4 @@ class Watcher {
   }
 }
 
-let has = {}
-let queue = []
-function flushQueue () {
-  queue.forEach(watcher => watcher.run())
-  has = {}
-  queue = []
-}
-function queueWatcher (watcher) {
-  const id = watcher.id
-  if (!has[id]) {
-    has[id] = true
-    queue.push(watcher)
-  }
-  nextTick(flushQueue)
-}
-const callbacks = []
-function flushCallbacks () {
-  callbacks.forEach(cb => cb())
-}
-function nextTick (cb) {
-  callbacks.push(cb)
-  const timerFunc = () => {
-    flushCallbacks()
-  }
-  if (Promise) {
-    return Promise.resolve().then(timerFunc)
-  }
-  if (MutationObserver) {
-    const observe = new MutationObserver(timerFunc)
-    const textNode = document.createTextNode(1)
-    observe.observe(textNode, { characterData: true })
-    textNode.textContent(2)
-  }
-  if (setImmediate) {
-    return setImmediate(timerFunc)
-  }
-  setTimeout(timerFunc, 0)
-}
 export default Watcher
