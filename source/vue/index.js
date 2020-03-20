@@ -40,6 +40,12 @@ Vue.prototype.$mount = function () {
 Vue.prototype.$watch = function (expr, handler, opts) {
   const vm = this
   const watcher = new Watcher(vm, expr, handler, { user: true, ...opts })
+  if (opts.immediate) {
+    handler.call(vm, watcher.value)
+  }
+  /**
+   * @todo return 一个 unwatchFn
+   */
 }
 
 function Vue (options) {

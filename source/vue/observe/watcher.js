@@ -32,10 +32,6 @@ class Watcher {
     this.deps = []
     // 创建 watcher 先将表达式对应的值取出来，也就是 old value
     this.value = this.get()
-    this.immediate = opts.immediate
-    if (this.immediate) {
-      this.cb(this.value)
-    }
   }
 
   get () {
