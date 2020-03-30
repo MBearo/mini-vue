@@ -9,7 +9,9 @@ const vm = new Vue({
         name: 'xiaoming',
         age: 10
       },
-      arr: [1, 2, 3]
+      arr: [1, 2, 3],
+      firstname: 'a',
+      lastname: 'b'
     }
   },
   watch: {
@@ -19,14 +21,21 @@ const vm = new Vue({
       },
       immediate: true
     }
+  },
+  computed: {
+    fullname () {
+      return this.firstname + this.lastname
+    }
   }
 })
 console.log(vm)
 setTimeout(_ => {
   vm.msg = 'world'
+  vm.lastname = 'z'
 }, 1000)
 setTimeout(_ => {
   vm.msg = 'world2'
+  vm.arr.push(5)
 }, 2000)
 
 // let id = 0

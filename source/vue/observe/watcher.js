@@ -30,19 +30,35 @@ class Watcher {
 
     this.depsId = new Set()
     this.deps = []
+
+    this.lazy = opts.lazy
+    this.dirty = this.lazy
+
     // 创建 watcher 先将表达式对应的值取出来，也就是 old value
-    this.value = this.get()
+    // 如果是计算属性，默认不调用get
+    this.value = this.lazy ? undefined : this.get()
   }
 
   get () {
     pushTarget(this)
-    const value = this.getter()
+    const value = this.getter.call(this.vm)
     popTarget()
     return value
   }
 
   update () {
-    queueWatcher(this)
+    if (this.lazy) {
+      this.dirty = true
+    } else {
+      queueWatcher(this)
+    }
+  }
+
+  depend () {
+    let i = this.deps.length
+    while (i--) {
+      this.deps[i].depend()
+    }
   }
 
   run () {
@@ -62,6 +78,11 @@ class Watcher {
       // this 指 watcher
       dep.addSub(this)
     }
+  }
+
+  evaluate () {
+    this.value = this.get()
+    this.dirty = false
   }
 }
 

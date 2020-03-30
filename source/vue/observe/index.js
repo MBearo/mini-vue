@@ -1,4 +1,6 @@
 import Observer from './observer'
+import Watcher from './watcher'
+import Dep from './dep'
 
 function proxy (vm, source, key) {
   Object.defineProperty(vm, key, {
@@ -18,8 +20,17 @@ function initData (vm) {
   }
   observe(vm._data)
 }
-function initComputed () {
-
+function initComputed (vm) {
+  const computed = vm.$options.computed
+  const watchers = vm._watchersComputed = Object.create(null)
+  for (const key in computed) {
+    const userDef = computed[key]
+    watchers[key] = new Watcher(vm, userDef, () => {}, { lazy: true })
+    // 把声明的key挂到到vm上
+    Object.defineProperty(vm, key, {
+      get: createComputedGetter(vm, key) // 返回一个function
+    })
+  }
 }
 function initWatch (vm) {
   const watch = vm.$options.watch
@@ -32,6 +43,21 @@ function initWatch (vm) {
       handler = userDef
     }
     createWatcher(vm, key, handler, { immediate: userDef.immediate })
+  }
+}
+
+function createComputedGetter (vm, key) {
+  const watcher = vm._watchersComputed[key]
+  return function () {
+    if (watcher) {
+      if (watcher.dirty) {
+        watcher.evaluate()
+      }
+      if (Dep.target) {
+        watcher.depend()
+      }
+      return watcher.value
+    }
   }
 }
 
