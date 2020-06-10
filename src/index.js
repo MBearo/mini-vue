@@ -4,38 +4,44 @@ const vm = new Vue({
   el: '#app',
   data () {
     return {
-      msg: 'hello',
-      school: {
-        name: 'xiaoming',
-        age: 10
-      },
-      arr: [1, 2, 3],
-      firstname: 'a',
-      lastname: 'b'
-    }
-  },
-  watch: {
-    msg: {
-      handler (newVal, oldVal) {
-        console.log('watch', newVal, oldVal)
-      },
-      immediate: true
-    }
-  },
-  computed: {
-    fullname () {
-      return this.firstname + this.lastname
+      msg: {
+        text: {
+          name: {
+            age: 'ssss'
+          }
+        }
+      }
+      // school: {
+      //   // name: 'xiaoming',
+      //   age: 10
+      // }
+      // arr: [99, 88, 77]
+      // firstname: 'a',
+      // lastname: 'b'
     }
   }
+  // watch: {
+  //   msg: {
+  //     handler (newVal, oldVal) {
+  //       console.log('watch', newVal, oldVal)
+  //     },
+  //     immediate: true
+  //   }
+  // },
+  // computed: {
+  //   fullname () {
+  //     return this.firstname + this.lastname
+  //   }
+  // }
 })
 console.log(vm)
+// setTimeout(_ => {
+//   vm.msg = 'world'
+//   vm.lastname = 'z'
+// }, 1000)
 setTimeout(_ => {
-  vm.msg = 'world'
-  vm.lastname = 'z'
-}, 1000)
-setTimeout(_ => {
-  vm.msg = 'world2'
-  vm.arr.push(5)
+  // vm.msg = 'world2'
+  // vm.arr.push(5)
 }, 2000)
 
 // let id = 0

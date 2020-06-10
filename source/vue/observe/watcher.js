@@ -9,7 +9,7 @@ class Watcher {
    * @param {*} vm
    * @param {*} exprOrFn
    * @param {*} cb
-   * @param {*} opts
+   * @param {*} opts {user,lazy}
    */
   constructor (vm, exprOrFn, cb = () => { }, opts = {}) {
     this.vm = vm
@@ -63,6 +63,7 @@ class Watcher {
 
   run () {
     // 新值
+    // 这里会再调一遍get，会重复添加依赖，所以在addDep有去重
     const value = this.get()
     if (value !== this.value) {
       this.cb(value, this.value)

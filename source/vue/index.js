@@ -34,7 +34,8 @@ Vue.prototype.$mount = function () {
   const updateComponent = () => {
     vm._update()
   }
-  const watcher = new Watcher(vm, updateComponent)
+  window.watcher = new Watcher(vm, updateComponent)
+  console.log(watcher)
 }
 
 Vue.prototype.$watch = function (expr, handler, opts) {
