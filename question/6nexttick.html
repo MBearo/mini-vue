@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    let cbs = []
+    let pendings = false
+    function flushCallback() {
+      cbs.forEach(fn => fn())
+    }
+    function nextTick(fn) {
+      cbs.push(fn)
+      if (!pendings) {
+        pendings = true
+        Promise.resolve().then(flushCallback)
+      }
+    }
+    function render() {
+      console.log('渲染');
+    }
+    nextTick(render)
+    nextTick(render)
+    nextTick(render)
+    console.log('gengxin')
+    console.log('gengxin')
+  </script>
+</body>
+
+</html>

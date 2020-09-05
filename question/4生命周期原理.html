@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    function mergeHook(parentVal, childVal) {
+      if (childVal) {
+        if (parentVal) {
+          return parentVal.concat(childVal)
+        } else {
+          return [childVal]
+        }
+      } else {
+        return parentVal
+      }
+    }
+    function mergeOptions(parent, child) {
+      let opts = {}
+      for (const key in child) {
+        opts[key] = mergeHook(parent[key], child[key])
+      }
+      return opts
+    }
+    function callHook(vm, hookName) {
+      vm.options[hookName] && vm.options[hookName].forEach(h => h())
+    }
+    function Vue(options) {
+      this.options = mergeOptions(this.constructor.options, options)
+
+      callHook(this, 'beforeCreate')
+      callHook(this, 'created')
+    }
+    //全局组件 全局过滤器之类的
+    Vue.options = {}
+    Vue.mixin=function(obj){
+      this.options=mergeOptions(this.options,obj)
+    }
+    Vue.mixin({
+      beforeCreate() {
+        console.log(2)
+      }
+    })
+    new Vue({
+      beforeCreate() {
+        console.log(1)
+      }
+    })
+  </script>
+</body>
+
+</html>
